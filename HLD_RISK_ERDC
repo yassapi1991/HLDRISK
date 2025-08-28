@@ -1,0 +1,34 @@
+## 4.x Logical View — ERDC (Entity Risk Data & Calculation)
+
+### Diagram Summary (text)
+Core entities:
+- **Entity** (central, linked to Region, Category, Classification)
+- **MonitoringFlag** → stores Trusted entities, Monitoring list, Common Risk categories
+- **JobExecutionHistory** → logs all risk calculation runs (audit trace)
+- **ComponentRiskScoreResult** → per-component score (Governance, ManualRiskType, DefinedRisk)
+- **FinalRiskScoreResult** → latest summary across components
+- **FinalRiskScoreResultDetail** → breakdown per component, with IsMonthlySnapshot flag
+- **IndustrialRiskScoreResult** → aggregated/averaged scores by classification
+- **GovernanceEvaluationResult, ManualRiskType, DefinedRisk** → inputs feeding component scores
+- **Form** → reference for governance/defined risk capture
+
+Key relationships:
+- Entity links to Region, Category, Classification.
+- Entity is referenced by results (ComponentRiskScore, FinalRiskScore, IndustrialRiskScore).
+- MonitoringFlag relates back to Entity (trusted/monitored lists).
+- JobExecutionHistory ties to ComponentRiskScoreResult.
+
+### Department Separation
+Entities with department property:
+- ComponentRiskScoreResult  
+- FinalRiskScoreResult  
+- FinalRiskScoreResultDetail  
+- IndustrialRiskScoreResult  
+- MonitoringFlag  
+
+→ Ensures Governance vs AML/CTF scores remain isolated.
+
+### Notes
+- **Snapshots**: FinalRiskScoreResultDetail includes IsMonthlySnapshot flag to distinguish current vs monthly.
+- **Audit**: JobExecutionHistory provides traceability for risk calculations.
+- **Industrial view**: IndustrialRiskScoreResult supports aggregate-level reporting.

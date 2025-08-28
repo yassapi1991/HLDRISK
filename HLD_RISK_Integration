@@ -1,0 +1,51 @@
+# Risk Management – Integration
+
+## Overview
+Risk Management integrates with multiple NCNP modules and external systems to exchange evaluation forms, disclosure questionnaires, evaluation execution results, and corrective actions. Integration is asynchronous using **Business Event Hub** with subscriptions, combined with synchronous **REST APIs** for triggering actions.
+
+---
+
+## Integration Points
+
+### 1. Evaluation Form Management
+- Flow:
+  - Actor approves form → REST API → Publish event `EvaluationFormApproved`.
+  - Risk Management subscribes and retrieves the form.
+- Purpose: Provide forms for configuring risk calculations.
+
+---
+
+### 2. Disclosure Management
+- Flow:
+  - Actor creates/updates disclosure questionnaire → REST API → Publish event `DisclosureQuestionnaireCreated/Updated`.
+  - Risk Management subscribes and retrieves disclosure questionnaires.
+- Purpose: Link disclosure questionnaires as inputs into Risk configuration.
+
+---
+
+### 3. Evaluation Execution
+- Flow:
+  - Actor submits evaluation → REST API → Publish event `AnswerCreated`.
+  - Risk Management subscribes and retrieves evaluation results.
+  - Notifications triggered for status updates.
+- Purpose: Sync final evaluation scores to Risk Management.
+
+---
+
+### 4. Corrective Action Module
+- **Observation Sync**:
+  - Observation created in Risk Management → Publish event `ObservationCreated`.
+  - Corrective Action module subscribes and retrieves observation for tracking.
+- **Corrective Action Sync**:
+  - Corrective Action created in Risk Management → Publish event `CorrectiveActionCreated`.
+  - Corrective Action module subscribes and retrieves for follow-up.
+- Notifications are also triggered at each event.
+
+---
+
+## Architectural Notes
+- Business Event Hub is the central async broker for module-to-module integration.
+- REST APIs are used for synchronous actions (e.g., create/update).
+- Risk Management depends on Evaluation Form, Disclosure, and Execution modules as **inbound integrations**.
+- Corrective Actions are **outbound integrations** from Risk Management.
+

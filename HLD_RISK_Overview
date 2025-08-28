@@ -1,0 +1,25 @@
+## 4.x System Overview — Risk Management
+
+### Sub-Modules
+- **Risk Configuration**  
+  Defines Manual/Defined Risks, Risk Types, Criteria Weights, Risk Presentation.  
+  Integrates with external data (Evaluation Forms/Results).  
+  Triggers recalculation of Risk Component and Final Scores → inputs for dashboards & reports.
+
+- **Inspection Plan and Journey**  
+  Creates and manages inspection plans & journeys.  
+  During journeys, users create Observations, Inquiries, and Corrective Actions → forwarded to Corrective Action module.  
+  Final Report aggregates risk scores, observations, corrective actions.
+
+- **ERDC (Entity Risk Data & Calculation)**  
+  Stores calculation results for Risk Scores.  
+  Provides dashboards and visualizations.  
+  Maintains snapshots (current vs monthly).
+
+- **Risk Integration**  
+  Handles communication with external modules (Form Management, Form Execution, Corrective Action).  
+  Uses **Kafka (async events)** for cross-module integration, consistent with system-wide microservices.
+
+### External Dependencies
+- **External Data Sources**: Evaluation Form Management, Form Execution.  
+- **Corrective Action Module**: Receives corrective actions and warnings.  

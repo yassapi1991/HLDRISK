@@ -1,0 +1,87 @@
+# HLD_RISK_ERDC.md
+
+## ERDC – Risk Management Background Jobs
+
+Risk Configuration changes and scheduled jobs trigger risk calculation processes.
+
+- Any change to the Risk Configuration automatically triggers recalculation of individual component risk scores.  
+- Recalculated component scores are aggregated to produce the final risk score for each Entity.  
+- Based on final risk scores and defined Risk Presentation Settings, the system visualizes risk attributes such as Risk Level (Low/Medium/High) and Color (Green/Yellow/Red).  
+- A monthly scheduled job snapshots the current final risk scores for dashboard/report visualization.  
+
+---
+
+## Architecture Overview
+
+- Risk Management Background Job is a separate instance from the Risk Management API.  
+- It is deployed on a pod **without load balancing**.  
+- It shares source code and libraries with the Risk Management API and DB.  
+- Background jobs are managed with **Hangfire (.NET)**, using schedule expressions (cron).  
+- Example: `"0 0 * * *"` = run daily at midnight; `"29"` = monthly run on the 29th.  
+
+---
+
+## Core Processes
+
+### Triggering Risk Recalculation
+1. Risk Configuration update sends event → Business Event Queue.  
+2. Consumer service in Background Job listens and initiates a Hangfire job.  
+3. Job calculates component risk scores.  
+4. System creates/updates **LockFlag** record with expiration to prevent parallel config changes.  
+
+### Aggregate Component Risk Score
+- After component jobs complete, system creates `RiskAggregator` job to combine scores.  
+- If only Risk Criteria Weight changed → system bypasses component jobs, runs `RiskAggregator` directly.  
+
+### Monthly Snapshot Risk Scores
+- Daily Hangfire job runs at start of day.  
+- Compares current date with configured `RiskScoreCaptureDate`.  
+- If matched → snapshot current risk scores of all entities, store as monthly data.  
+- Calculates **average risk scores by industry/classification**.  
+- Retains snapshots for **12 months** (older data is purged).  
+
+---
+
+## LockFlag Design
+
+| Column         | Type       | Notes                                           |
+|----------------|-----------|--------------------------------------------------|
+| Id             | guid      | Primary key                                      |
+| DepartmentId   | tinyint   | Isolation by department                          |
+| LockCategory   | nvarchar  | Lock scope (e.g. Risk Calculation, Config Change)|
+| IsLocked       | bit       | Active lock flag                                 |
+| ExpirationTime | datetime2 | Expiration timestamp                             |
+| Remark         | nvarchar  | Optional remark field                            |
+
+- Active LockFlag prevents risk configuration changes during recalculation.  
+- Lock resets after jobs complete (`IsLocked=false`, `ExpirationTime=null`).  
+
+---
+
+## Types of Recalculation
+
+- **Governance Risk Result** → Based on governance evaluation scores.  
+- **Manual Risk Type** → Triggered when ManualRisk/ManualRiskType changes.  
+- **Defined Risk** → Triggered when Defined Risk changes.  
+- **Risk Criteria Weight** → Does not trigger full recalculation; only `RiskAggregator` re-run.  
+- **RiskAggregator Job** → Combines component results into final scores.  
+
+---
+
+## Monthly Snapshot Process
+
+- Snapshot created by cloning current risk scores.  
+- Generates data for “Average Score by Industry”.  
+- Includes same lock mechanism as component jobs.  
+
+---
+
+## Data Flow – Dashboard & Reports
+
+Roles: Risk Setting Specialist, Risk Officer, Risk Supervisor, Director, Vice CEO.  
+
+- **Dashboard View** → High-level overview.  
+- **Entity List** → List and export of entities.  
+- **Entity Risk Profile** → Detailed view of risk data.  
+- **Risk Score Trend** → Historical trends by entity.  
+- **Add to Inspection Plan** → Direct link from risk data to inspection workflows.  

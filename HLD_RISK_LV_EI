@@ -1,0 +1,23 @@
+# 4. System Architecture
+
+## 4.2 Logical View – Entity Information
+
+### Class Diagram for Risk Management – Entity Information
+This diagram includes common entities/tables that are synchronized from external systems.  
+Data synchronization is developed mainly to support the **Onsite Visit Module** and is re-used in the **Risk Management Module**.  
+
+**Diagram Summary (textual description):**
+- Central entity: **Entity**
+- Relationships:
+  - Entity ↔ Entity Type (1..1)
+  - Entity ↔ Entity Size (1..1)
+  - Entity ↔ Classification (1..1)
+  - Entity ↔ Category (1..1)
+  - Entity ↔ Region (0..*) → Region ↔ City (1..0..*)
+  - Entity ↔ City (0..*)
+- Each Entity can belong to one **Type**, one **Size**, one **Classification**, one **Category**.
+- Entities are associated with **Region** and **City** for location context.
+
+**Notes:**
+- Role permission tables are shared with other modules, not described here.
+- Entities/tables in light green are mainly described in other diagrams.

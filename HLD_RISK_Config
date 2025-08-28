@@ -1,0 +1,42 @@
+## 4.2 Logical View — Risk Configuration
+
+### Diagram Summary (text)
+Core entities:
+- **RiskType**, **ManualRiskType**, **ManualRisk**
+- **ManualRiskTypeRange**
+- **RiskCriteriaWeight**, **RiskCriteriaWeightDetail**
+- **DefinedRisk**, **DefinedRiskCriteria**
+- **GovernanceResultRisk**, **GovernanceResultRiskRange**
+- **RiskPresentation**, **RiskPresentationRange**
+- **EvaluationForm**
+- **ArchivedItemType**, **ArchivedItem**
+- **RiskManagementSetting**
+- **SelectableOptionCategory**, **SelectableOption**
+- **UploadedDocument**
+- **AuditTrail**, **LockFlag**
+- **Entity** (shared/common, synced from external modules)
+
+Key relationships (high-level):
+- `ManualRiskType 1..* → ManualRiskTypeRange`
+- `RiskType 0..* ← ManualRiskType` (types group manual risks)
+- `RiskCriteriaWeight 1..* → RiskCriteriaWeightDetail` (per type/criteria)
+- `DefinedRisk 1..* → DefinedRiskCriteria`
+- `Entity 1..* ← ManualRisk`, `Entity 1..* ← GovernanceResultRisk` (risks attach to entities)
+- `GovernanceResultRisk 1..* → GovernanceResultRiskRange`
+- `RiskPresentation 1..* → RiskPresentationRange`
+- `ArchivedItemType 1..* → ArchivedItem`
+
+### Department separation (multi-tenancy by department)
+- Entities **with department property** (green in the diagram): used to **separate Governance vs AML** data.
+- **Most UI tables** (those shown on screens) **must carry `department`**.
+- Child/range/detail tables (e.g., `...Range`, `...Detail`) usually **don’t** need `department`.
+- `UploadedDocument` has `department` (allows per-department storage).
+- `RiskManagementSetting` has `department` (per-department UI settings; technical app settings may have `department = null` to share).
+- `ArchivedItemType` **does not** have `department` (shared master data).
+- `SelectableOptionCategory` is **per-department** (admin manages both; may vary per dept).
+- `LockFlag` has `department` (separate background jobs/locks per dept).
+
+### Notes
+- **LockFlag**: prevents config edits during background **risk calculation** jobs.
+- **Entity** is common data synced from external systems (source of truth outside Risk module).
+- **AuditTrail**: required for all config changes (who/when/what; immutable).

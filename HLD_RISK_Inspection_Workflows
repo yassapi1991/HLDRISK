@@ -1,0 +1,77 @@
+## Risk Inspection Workflows
+
+This section documents the workflows for Inspection Plans and Journeys, aligned with BRD requirements.
+
+---
+
+### Annual Inspection Plan
+- **Roles**: Risk Supervisor, Risk Director / Deputy Manager
+- **Workflow**: Draft → Submit → PendingFirstApproval → PendingSecondApproval → Approved → Completed
+- **Governance**: Two-level approval (maker-checker). Draft reserved but may not be exposed in UI. Approval actions must be logged.
+
+---
+
+### Irregular Inspection Plan
+- **Roles**: Risk Supervisor, Risk Director
+- **Workflow**: Single active plan per department → Add entities → Manage assignment requests
+- **Governance**: Simplified — only one status (Active). Approvals handled at assignment level, not plan level.
+
+---
+
+### Assignment Request
+- **Roles**: Risk Officer, Risk Director
+- **Workflow**: Submit → PendingApproval → Approved / Rejected
+- **Governance**: Requests remain in system if rejected (no resubmission cycle). Immutable audit trail required.
+
+---
+
+### Inspection Journey (InspectionEntity)
+- **Roles**: Risk Officer, Evaluators, Risk Supervisor
+- **Workflow**: Start Journey → Execute inspections (Office/Onsite) → Approve inspections → Final Report → Corrective Actions → Close Journey
+- **Governance**: Parent-child workflow model. Top layer is `InspectionEntity`; child records created in OfficeInspection, OnsiteInspection, FinalReport, FollowUpVisit, and Recommendation.
+
+---
+
+### OfficeInspection Workflow
+- **Role**: Risk Officer
+- **Workflow**: Start → Appointment → Conduct Inspection → Complete
+- **Governance**: Linked to InspectionEntity. Actions logged immutably.
+
+---
+
+### OnsiteInspection Workflow
+- **Role**: Risk Officer
+- **Workflow**: Start → Appointment → Conduct Inspection → Complete
+- **Governance**: Same as OfficeInspection. Immutable history required.
+
+---
+
+### FinalReport Workflow
+- **Roles**: Risk Officer, Risk Director
+- **Workflow**: Draft → Submit → PendingApproval → Approved → Completed
+- **Governance**: Locks upstream artifacts once approved. Maker-checker enforced.
+
+---
+
+### FollowUpVisit Workflow
+- **Role**: Risk Officer
+- **Trigger**: Starts only after Inspection Journey is marked Completed
+- **Workflow**: Create Visit → Appointment → Conduct → Update Result → Closed
+- **Governance**: Must log outcomes and link to corrective actions.
+
+---
+
+### Recommendation Workflow
+- **Roles**: Risk Officer, Risk Director
+- **Trigger**: Starts only after Inspection Journey is marked Completed
+- **Workflow**: Create → Submit → WaitingForApproval → Approved / ReturnedForEdit
+- **Governance**: Approval cycle required. SoD enforced, audit trail mandatory.
+
+---
+
+### Governance Notes (All Workflows)
+- **SoD/RBAC**: Submission and approval roles must be distinct. Integration with Keycloak/Nafath required.
+- **Auditability**: All state transitions logged immutably with actor, timestamp, and request ID.
+- **Department Isolation**: Annual and Irregular plans scoped per department. Explicit enforcement required to prevent Governance vs AML mixing.
+- **Recalculation Triggers**: Approval of key states (FinalReport, CorrectiveAction) should trigger recalculation of risk profile.
+- **Locking**: Once FinalReport is approved, earlier workflow artifacts (Questionnaires, Inspections) must be locked.

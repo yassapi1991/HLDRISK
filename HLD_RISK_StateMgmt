@@ -1,0 +1,30 @@
+## 4.x Common Utility — State Management
+
+### Purpose
+A shared utility to handle **state transitions** in complex flows (Annual Inspection Plan, Inspection Journey, etc.), reducing logic in both Backend and Frontend.
+
+### Diagram Summary
+Core entities:
+- **State** → master list of states.
+- **Action** → possible actions.
+- **StateAction** → maps which actions are allowed from each state.
+- **StateManagement…** → orchestrates state changes (BeginState → Action → EndState).
+- **StateChangeHistory** → logs each state transition (BeginState, Action, EndState, ChangedBy, ChangedAt, Remarks).
+- **Process** → represents a business flow instance with unique ID, links to domain objects (AnnualInspectionPlan, InspectionEntity, OnsiteInspection, OfficeInspection, FinalReport).
+
+### Behavior
+- When a business flow starts, a **Process instance** is created.  
+- On each transition, **StateChangeHistory** records details and updates the domain object’s StatusId.  
+- **APIs** (e.g., `GetAvailableActions`) expose valid actions per state/user.  
+- FE dynamically shows actions/buttons based on returned list.
+
+### Example
+- User has `RiskManagement.AnnualPlan.1stApproveReject` permission.  
+- Plan in state `WaitingForFirstApproval`.  
+- API returns actions `FirstApproval`, `ReturnToEdit`.  
+- FE renders only these actions.
+
+### Notes
+- **No department property**: both Governance and AML domains share the same workflow and code logic.  
+- Permissions mapped via **Action table** to role codes.  
+- Ensures **Separation of Duties** through RBAC + mapped actions.

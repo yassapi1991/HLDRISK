@@ -1,0 +1,40 @@
+HLD_RISK_Inspection## 4.x Logical View — Inspection Plan & Journey
+
+### Diagram Summary (text)
+Core aggregates/entities:
+- **AnnualInspectionPlan** (dept-scoped)
+- **InspectionEntity** (dept-scoped; links plan ↔ entity; supports annual & irregular plans)
+- **RiskOfficerAssignment**, **IrregularAssignmentRequest**
+- **Observation**, **Recommendation**, **CorrectiveAction**, **FollowupVisit**
+- **FinalReport**, **ReportObservation**
+- **DeskReview / FieldVisit flows**: QuestionnaireSetting, Questionnaire, Question, QuestionAnswer, Inquiry
+- **Appointment**, **AppointmentFeedback**
+- **Classification** (result), **EvaluationForm**
+- **UploadedDocument**
+- **ObservationTemplate** (dept-scoped templates)
+- **SelectableOption** (for picklists)
+- **User**, **Entity**, **Priority**
+
+Key relationships (high level):
+- `AnnualInspectionPlan 1..* → InspectionEntity`
+- `InspectionEntity 1..1 → Entity` (inspected org)
+- `InspectionEntity 0..* → Appointment → AppointmentFeedback`
+- `InspectionEntity 0..* → DeskReview/FieldVisit artifacts (Questionnaire*, Inquiry, UploadedDocument)`
+- `InspectionEntity 0..* → Observation 0..* → Recommendation/CorrectiveAction → FollowupVisit`
+- `InspectionEntity 0..1 → FinalReport (closes journey)`
+- `RiskOfficerAssignment 1..* → User (Risk Officer)`
+- `SelectableOption/Template` support forms & observations
+
+### Department Separation
+- **Has `department`**: `AnnualInspectionPlan`, `InspectionEntity`, `ObservationTemplate` (per BRD: Governance vs AML isolation).
+- Child/detail tables may omit `department` **if** FK enforces dept via parent.
+
+### Notes / Behavior
+- **Irregular plans** still carry `department` (separate per domain).
+- **FinalReport** required to close journey.
+- **AuditTrail** must capture all key actions (assignments, observations, report).
+
+### Open questions to confirm
+- Does **FinalReport** block edits to upstream artifacts? (lock on close)
+- Are **reassignments** and **irregular requests** auditable & approved (SoD)?
+- Pagination & filters for large plans (year, dept, priority)?

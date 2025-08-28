@@ -1,0 +1,44 @@
+# BRD Understanding – Risk Management Service
+
+## Domain Role
+- Central compliance monitoring for NCNP.
+- Classifies entities into Low / Medium / High risk (configurable).
+- Triggers actions: audits, desk reviews, field visits, corrective actions, warnings.
+
+## Key Users / Roles
+- Deputy CEO, Director, Risk Supervisor, Risk Officer, Risk Settings Preparer, Entity Representative.
+
+## Core Capabilities
+1. Risk Classification (configurable thresholds, weights).
+2. Audit Initiation (desk/field).
+3. Questionnaires & Inspections (workflows).
+4. Corrective Actions & Warnings (linked to risk results).
+5. Manual Risk Entry (CRUD + archive, versioning, attachments).
+6. Risk Criteria Percentages (must sum = 100% per entity type/size).
+7. Dashboard & Analytics (real-time, role-based).
+
+## Integration Points
+- Inbound: Governance Assessment, Predefined Risks, Desk Review, Field Visits.
+- Outbound: Corrective Actions, Disclosure Management.
+- Event/API integration: API Gateway + Kafka.
+
+## Security / Compliance
+- SDAIA/NDMO privacy, NCA ECC.
+- Encryption in transit/at rest.
+- IAM: Keycloak + Nafath SSO.
+- Audit logs, immutable records.
+
+## Non-Functional Requirements
+- Configurable & auditable.
+- Real-time updates.
+- Modular, loosely coupled.
+
+## Current → Challenges
+- Manual, slow, error-prone, not integrated.
+- Hard to track corrective actions.
+
+## Future → Objectives
+- Centralized dynamic risk platform.
+- Automated inspections & workflows.
+- Full system integration.
+- Real-time dashboards & faster decisions.

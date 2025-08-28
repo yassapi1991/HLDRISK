@@ -1,0 +1,83 @@
+## Risk Configuration Workflows
+
+This section documents the workflows for Risk Configuration, aligned with BRD requirements.
+
+---
+
+### Common Approval Workflow
+- **Flow**: Start → PendingApproval → Approved → End.
+- **Loop**: ReturnedToEdit → Resubmit → PendingApproval.
+- **Governance**: One-level approval (Supervisor or Director depending on config type).
+- **Notes**: Enforces SoD (preparer ≠ approver), requires audit trail, triggers recalculation events.
+
+---
+
+### Manual Risk Type
+- **Role**: Risk Settings Specialist.
+- **Workflow**: View List → Create New → Edit → Archive.
+- **Governance**: One-level approval, SoD enforced, audit logging required.
+
+---
+
+### Manual Risk
+- **Role**: Risk Officer.
+- **Workflow**: View List → Create New → Edit → Archive.
+- **Governance**: Linked to Manual Risk Type. Requires traceability of changes and audit.
+
+---
+
+### Defined Risk
+- **Role**: Risk Supervisor.
+- **Workflow**: View List → Create New → Edit → Archive.
+- **Governance**: One-level approval workflow. Must log approvals and rejections.
+
+---
+
+### Governance Result Risk
+- **Roles**: Risk Settings Specialist, Risk Supervisor.
+- **Workflow**: Create/Edit → Submit → Approve/Reject.
+- **Governance**: Uses common approval workflow. Requires immutable history of changes.
+
+---
+
+### Risk Criteria Weight
+- **Role**: Risk Settings Specialist.
+- **Workflow**: Create New → Submit → Approve/Reject → Resubmit.
+- **Governance**: Common workflow, one-level approval. Must trigger recalculation of risk scores.
+
+---
+
+### Risk Presentation
+- **Roles**: Risk Settings Specialist, Risk Supervisor.
+- **Workflow**: Create/Edit → Submit → Approve/Reject → Resubmit.
+- **Governance**: Follows common approval workflow. SoD applies.
+
+---
+
+### Selectable Options
+- **Role**: Risk Settings Specialist.
+- **Workflow**: View List → Create New Option/Category → Edit/Delete.
+- **Governance**: Requires admin setup per department. To be clarified if shared.
+
+---
+
+### ArchiveItem Management
+- **Role**: System Administrator.
+- **Workflow**: View List → Restore → Redirect to original item.
+- **Governance**: Master data shared across departments. No department property.
+
+---
+
+### Risk Management Setting
+- **Role**: System Administrator.
+- **Workflow**: View → Update Setting.
+- **Governance**: Department-specific configurations allowed. Requires audit trail.
+
+---
+
+### Governance Notes (All Configurations)
+- **SoD/RBAC**: Preparer and approver roles separated.
+- **Auditability**: All create, edit, archive, and resubmit actions logged.
+- **Department Isolation**: Most settings department-specific; exceptions must be explicit (e.g., ArchiveItem).
+- **Recalculation Triggers**: Approval of configurations must trigger risk score recalculations.
+- **Locking**: During recalculation, config screens locked via LockFlag mechanism.
