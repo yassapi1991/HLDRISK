@@ -1,0 +1,29 @@
+tech_stack:
+  api_gateway: Apigee|Kong|Ocelot
+  runtime: Kubernetes
+  messaging: Kafka
+  comms: REST+gRPC
+
+nfrs:
+  latency_ms_p95: 200
+  throughput_tps_baseline: 200
+  availability: "99.9%"
+  rto: "1h"
+  rpo: "15m"
+
+security:
+  auth: "OAuth2/OIDC with JWT"
+  transport: "mTLS"
+  encryption: "AES-256 at rest, TLS 1.2+ in transit"
+  secrets: "Vault/KMS; no secrets in code"
+
+compliance:
+  residency: "KSA"
+  regs: ["SAMA", "NCA", "GDPR (if applicable)"]
+  retention_years:
+    audit_logs: 5
+    risk_decisions: 7
+
+risk_domain:
+  scoring: ["explainability", "thresholds", "false positives workflow"]
+  approvals: ["4-eyes", "SoD", "evidence storage", "auditability"]
